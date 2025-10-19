@@ -32,7 +32,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 test {
     useJUnitPlatform()
-    systemProperties(System.getProperties())
+    systemProperty "selenide.headless", System.getProperty("selenide.headless", "false")
 }
 
 tasks.register('allureServe-chrome', Exec) {

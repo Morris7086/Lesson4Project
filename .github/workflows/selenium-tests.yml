@@ -1,0 +1,53 @@
+name: CI Autotests Run
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  pages: write
+  contents: write
+
+jobs:
+  run-autotests:
+    name: Run Tests and Deploy Report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Run tests
+        run: ./gradlew clean test -Dselenide.headless=true
+
+      - name: Allure Report
+        uses: simple-elf/allure-report-action@v1.7
+        with:
+          allure_results: "build/allure-results"
+          allure_report: "allure-report"
+          gh_pages: "true"
+          subfolder: ""
+          keep_reports: "10"
+          report_url: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
