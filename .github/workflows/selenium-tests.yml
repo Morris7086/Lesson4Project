@@ -1,7 +1,7 @@
 name: CI Autotests Run
 on:
   push:
-    branches: [ main ]
+    branches: [ page-object ]
   workflow_dispatch:
 
 permissions:
